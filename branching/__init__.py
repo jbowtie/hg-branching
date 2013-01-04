@@ -1,5 +1,8 @@
 #! /usr/bin/env python
-
+#
+# Copyright: John C Barstow 2013
+# License: GPLv2+
+#
 '''branching
 
 Manage feature branches.
