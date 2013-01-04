@@ -2,7 +2,7 @@
 
 '''branching
 
-Manage geature branches.
+Manage feature branches.
 '''
 
 from mercurial import commands, hg
