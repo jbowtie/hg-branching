@@ -44,7 +44,7 @@ def close_branch(ui, repo, branch, **opts):
 
     heads = repo.branchheads(branch)
     if len(heads) == 0:
-        ui.status("Branch %s is already closed." % branch)
+        ui.status("Branch %s is already closed.\n" % branch)
         return
 
     #thoughts on making this work without switching branches
