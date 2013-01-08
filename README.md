@@ -11,18 +11,19 @@ Commands
 harvest
 -------
 
-    $hg harvest BRANCH_NAME
+    $hg harvest BRANCH_NAME [TARGET_BRANCH]
 
-Close the specified branch and merge it into the default branch. (Future
-versions will allow you to specify the destination branch). If the merge fails,
-you will need to resolve and commit the merge manually.
+Close the specified branch and merge it into the default branch, or the
+named target branch. If the merge fails, you will need to resolve and
+commit the merge manually.
 
 close
 -----
 
     $hg close BRANCH_NAME
 
-Close the specified branch.
+Close the specified branch. This command does not affect your working
+directory.
 
 switch
 ------
