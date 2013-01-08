@@ -10,19 +10,31 @@ Manage feature branches.
 
 from mercurial import commands, hg
 
-def harvest(ui, repo, branch, **opts):
+def harvest(ui, repo, branch, dest="default", **opts):
     """Merge a branch into default"""
     if branch not in repo.branchtags():
         ui.warn("Branch %s does not exist! (use 'hg branches' to get a list of branches)\n" % branch)
         return
 
-    #todo: verify branch is open and has one head
+    if dest not in repo.branchtags():
+        ui.warn("Destination branch %s does not exist! (use 'hg branches' to get a list of branches)\n" % branch)
+        return
+
+    heads = repo.branchheads(branch)
+    if len(heads) == 0:
+        ui.warn("Cannot harvest branch %s because it is currently closed. Use 'hg merge' to merge it manually." % branch)
+        return
+
+    if len(heads) > 1:
+        ui.warn("Branch %s has multiple heads. Use 'hg merge' to merge it manually." % branch)
+        return
+
     hg.clean(repo, branch)
     repo.commit("Closed branch %s" % branch, opts.get('user'), opts.get('date'), None, extra={'close':1})
-    hg.clean(repo, "default")
+    hg.clean(repo, dest)
     hg.merge(repo, branch)
     repo.commit("Merged %s" % branch, opts.get('user'), opts.get('date'), None)
-    ui.status("Completed merge of %s\n" % branch)
+    ui.status("Completed merge of %s into %s\n" % branch, dest)
 
 def close_branch(ui, repo, branch, **opts):
     """Close a branch"""
@@ -30,10 +42,19 @@ def close_branch(ui, repo, branch, **opts):
         ui.warn("Branch %s does not exist! (use 'hg branches' to get a list of branches)\n" % branch)
         return
 
-    #todo: verify branch is open and has one head
+    heads = repo.branchheads(branch)
+    if len(heads) == 0:
+        ui.status("Branch %s is already closed." % branch)
+        return
+
+    #thoughts on making this work without switching branches
+    #rev = repo.branchtip(branch)
+    #newrev = context.memctx(repo, [rev, None], msg, files=[], callback, user, date, extra={'close':1})
+    #newrev.commit()
+    current_branch = repo[None].branch()
     hg.clean(repo, branch)
     repo.commit("Closed branch %s" % branch, opts.get('user'), opts.get('date'), None, extra={'close':1})
-    hg.clean(repo, "default")
+    hg.clean(repo, current_branch)
 
 def switch_branch(ui, repo, branch, **opts):
     """Switch to the named branch"""
@@ -43,8 +64,9 @@ def switch_branch(ui, repo, branch, **opts):
     hg.clean(repo, branch)
 
 cmdtable = {
-        "harvest": (harvest, [], "hg harvest BRANCH_NAME"),
+        "harvest": (harvest, [], "hg harvest BRANCH_NAME [TARGET_BRANCH]"),
         "close": (close_branch, [], "hg close BRANCH_NAME"),
         "switch": (switch_branch, [], "hg switch BRANCH_NAME"),
 }
 
+testedwith='2.4.1'
