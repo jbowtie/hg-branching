@@ -8,7 +8,7 @@
 Manage feature branches.
 '''
 
-from mercurial import commands, hg
+from mercurial import commands, hg, context
 
 def harvest(ui, repo, branch, dest="default", **opts):
     """Merge a branch into default"""
@@ -48,13 +48,14 @@ def close_branch(ui, repo, branch, **opts):
         return
 
     #thoughts on making this work without switching branches
-    #rev = repo.branchtip(branch)
-    #newrev = context.memctx(repo, [rev, None], msg, files=[], callback, user, date, extra={'close':1})
-    #newrev.commit()
-    current_branch = repo[None].branch()
-    hg.clean(repo, branch)
-    repo.commit("Closed branch %s" % branch, opts.get('user'), opts.get('date'), None, extra={'close':1})
-    hg.clean(repo, current_branch)
+    rev = repo.branchtip(branch)
+    newrev = context.memctx(repo, [rev, None], "Closed branch %s" % branch, [], None, opts.get('user'), opts.get('date'), extra={'close':1, 'branch':branch})
+    newrev.commit()
+    #current_branch = repo[None].branch()
+    #hg.clean(repo, branch)
+    #repo.commit("Closed branch %s" % branch, opts.get('user'), opts.get('date'), None, extra={'close':1})
+    #hg.clean(repo, current_branch)
+    ui.status("Closed branch %s\n" % branch)
 
 def switch_branch(ui, repo, branch, **opts):
     """Switch to the named branch"""
