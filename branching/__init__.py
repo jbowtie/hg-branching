@@ -22,11 +22,11 @@ def harvest(ui, repo, branch, dest="default", **opts):
 
     heads = repo.branchheads(branch)
     if len(heads) == 0:
-        ui.warn("Cannot harvest branch %s because it is currently closed. Use 'hg merge' to merge it manually." % branch)
+        ui.warn("Cannot harvest branch %s because it is currently closed. \nUse 'hg merge' to merge it manually.\n" % branch)
         return
 
     if len(heads) > 1:
-        ui.warn("Branch %s has multiple heads. Use 'hg merge' to merge it manually." % branch)
+        ui.warn("Branch %s has multiple heads. \nUse 'hg merge' to merge it manually.\n" % branch)
         return
 
     hg.clean(repo, branch)
@@ -34,7 +34,7 @@ def harvest(ui, repo, branch, dest="default", **opts):
     hg.clean(repo, dest)
     hg.merge(repo, branch)
     repo.commit("Merged %s" % branch, opts.get('user'), opts.get('date'), None)
-    ui.status("Completed merge of %s into %s\n" % branch, dest)
+    ui.status("Completed merge of %s into %s\n" % (branch, dest))
 
 def close_branch(ui, repo, branch, **opts):
     """Close a branch"""
