@@ -47,14 +47,9 @@ def close_branch(ui, repo, branch, **opts):
         ui.status("Branch %s is already closed.\n" % branch)
         return
 
-    #thoughts on making this work without switching branches
     rev = repo.branchtip(branch)
     newrev = context.memctx(repo, [rev, None], "Closed branch %s" % branch, [], None, opts.get('user'), opts.get('date'), extra={'close':1, 'branch':branch})
     newrev.commit()
-    #current_branch = repo[None].branch()
-    #hg.clean(repo, branch)
-    #repo.commit("Closed branch %s" % branch, opts.get('user'), opts.get('date'), None, extra={'close':1})
-    #hg.clean(repo, current_branch)
     ui.status("Closed branch %s\n" % branch)
 
 def switch_branch(ui, repo, branch, **opts):
