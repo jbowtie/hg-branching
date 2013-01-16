@@ -3,15 +3,12 @@
 # Copyright: John C Barstow 2013
 # License: GPLv2+
 #
-'''branching
-
-Manage feature branches.
-'''
+'''commands to manage named branches'''
 
 from mercurial import commands, hg, context
 
 def harvest(ui, repo, branch, dest="default", **opts):
-    """Merge a branch into default"""
+    """Close and merge a named branch into the destination branch"""
     if branch not in repo.branchtags():
         ui.warn("Branch %s does not exist! (use 'hg branches' to get a list of branches)\n" % branch)
         return
@@ -29,8 +26,9 @@ def harvest(ui, repo, branch, dest="default", **opts):
         ui.warn("Branch %s has multiple heads. \nUse 'hg merge' to merge it manually.\n" % branch)
         return
 
-    hg.clean(repo, branch)
-    repo.commit("Closed branch %s" % branch, opts.get('user'), opts.get('date'), None, extra={'close':1})
+    rev = repo.branchtip(branch)
+    newrev = context.memctx(repo, [rev, None], "Closed branch %s" % branch, [], None, opts.get('user'), opts.get('date'), extra={'close':1, 'branch':branch})
+    newrev.commit()
     hg.clean(repo, dest)
     hg.merge(repo, branch)
     repo.commit("Merged %s" % branch, opts.get('user'), opts.get('date'), None)
