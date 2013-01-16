@@ -29,7 +29,13 @@ def harvest(ui, repo, branch, dest="default", **opts):
     rev = repo.branchtip(branch)
     newrev = context.memctx(repo, [rev, None], "Closed branch %s" % branch, [], None, opts.get('user'), opts.get('date'), extra={'close':1, 'branch':branch})
     newrev.commit()
-    hg.clean(repo, dest)
+
+    #don't need to switch if already on destination branch
+    curr = repo[None].branch()
+    if dest != curr:
+        hg.clean(repo, dest)
+        ui.status("Switched to branch %s before merging\n" % dest)
+
     hg.merge(repo, branch)
     repo.commit("Merged %s" % branch, opts.get('user'), opts.get('date'), None)
     ui.status("Completed merge of %s into %s\n" % (branch, dest))
@@ -54,6 +60,10 @@ def switch_branch(ui, repo, branch, **opts):
     """Switch to the named branch"""
     if branch not in repo.branchtags():
         ui.warn("Branch %s does not exist! (use 'hg branches' to get a list of branches)\n" % branch)
+        return
+    curr = repo[None].branch()
+    if branch == curr:
+        ui.status("Already on branch %s\n" % branch)
         return
     hg.clean(repo, branch)
 
