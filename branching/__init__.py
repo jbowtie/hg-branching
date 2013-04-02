@@ -67,10 +67,17 @@ def switch_branch(ui, repo, branch, **opts):
         return
     hg.clean(repo, branch)
 
+def cancel_merge(ui, repo, **opts):
+    """Cancel a merge"""
+    #TODO: check that merge is in progress
+    curr = repo[None].branch()
+    hg.clean(repo, curr)
+
 cmdtable = {
         "harvest": (harvest, [], "hg harvest BRANCH_NAME [TARGET_BRANCH]"),
         "close": (close_branch, [], "hg close BRANCH_NAME"),
         "switch": (switch_branch, [], "hg switch BRANCH_NAME"),
+        "cancel": (cancel_merge, [], "hg cancel"),
 }
 
 testedwith='2.4.1'
