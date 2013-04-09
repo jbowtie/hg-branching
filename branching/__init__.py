@@ -33,12 +33,13 @@ def harvest(ui, repo, branch, dest="default", **opts):
     #don't need to switch if already on destination branch
     curr = repo[None].branch()
     if dest != curr:
-        hg.clean(repo, dest)
+        hg.clean(repo, dest, False)
         ui.status("Switched to branch %s before merging\n" % dest)
 
-    hg.merge(repo, branch)
-    repo.commit("Merged %s" % branch, opts.get('user'), opts.get('date'), None)
-    ui.status("Completed merge of %s into %s\n" % (branch, dest))
+    failed = hg.merge(repo, branch, remind = False)
+    if not failed:
+        repo.commit("Merged %s" % branch, opts.get('user'), opts.get('date'), None)
+        ui.status("Completed merge of %s into %s\n" % (branch, dest))
 
 def close_branch(ui, repo, branch, **opts):
     """Close a branch"""
