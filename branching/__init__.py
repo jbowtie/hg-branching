@@ -5,7 +5,7 @@
 #
 '''commands to manage named branches'''
 
-from mercurial import commands, hg, context
+from mercurial import commands, hg, context, cmdutil, patch
 
 def harvest(ui, repo, branch, dest="default", **opts):
     """Close and merge a named branch into the destination branch"""
@@ -67,6 +67,22 @@ def switch_branch(ui, repo, branch, **opts):
         return
     hg.clean(repo, branch)
 
+def diff_branch(ui, repo, branch, **opts):
+    """Shows the changes from a branch"""
+    if branch not in repo.branchtags():
+        ui.warn("Branch %s does not exist! (use 'hg branches' to get a list of branches)\n" % branch)
+        return
+    curr = repo[None].branch()
+    if branch == curr:
+        ui.status("Already on branch %s\n" % branch)
+        return
+    rev = repo.branchtip(branch)
+    dest = "default"
+    drev = repo.branchtip(dest)
+    ancestor = repo.changelog.ancestor(rev, drev)
+    diffopts = patch.diffopts(ui, opts)
+    cmdutil.diffordiffstat(ui, repo, diffopts, ancestor, rev, None)
+
 def cancel_merge(ui, repo, **opts):
     """Cancel a merge"""
     #TODO: check that merge is in progress
@@ -77,6 +93,7 @@ cmdtable = {
         "harvest": (harvest, [], "hg harvest BRANCH_NAME [TARGET_BRANCH]"),
         "close": (close_branch, [], "hg close BRANCH_NAME"),
         "switch": (switch_branch, [], "hg switch BRANCH_NAME"),
+        "branchdiff": (diff_branch, [], "hg branchdiff BRANCH_NAME"),
         "cancel": (cancel_merge, [], "hg cancel"),
 }
 

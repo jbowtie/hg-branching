@@ -31,3 +31,11 @@ switch
     $hg switch BRANCH_NAME
 
 Switch to the specified branch. This is essentially an alias of `hg update -C`.
+
+branchdiff
+----------
+
+    $hg branchdiff BRANCH_NAME
+
+Shows all the branch changes consolidated into a single diff. Technically this is a
+diff between the branch creation point and the tip of the branch.
